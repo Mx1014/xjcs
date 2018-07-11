@@ -20,7 +20,10 @@ const cityjzinfo = () => import('@/components/cityjzinfo');
 const citynhcbyj = () => import('@/components/citynhcbyj');
 const citynhdysetting = () => import('@/components/citynhdysetting');
 const systemconfig = () => import('@/components/systemconfig');
+const userconfig = () => import('@/components/userconfig');
 const warnlist = () => import('@/components/warnlist');
+
+const lzshome = () => import('@/components/lzshome');
 
 Vue.use(Router)
 
@@ -166,13 +169,31 @@ export default new Router({
       }
     },
     {
+      path: '/usernamager',
+      name: 'userconfig',
+      component: userconfig,
+      meta:{
+        mindex:6
+      }
+    },
+    {
       path: '/warnlist',
       name: 'warnlist',
       component: warnlist,
       meta:{
-        mindex:0
+        mindex:6
       }
     },
+    {
+      path: '/lzcityhome',
+      name: 'lzcityhome',
+      component: lzshome,
+      meta:{
+        mindex:-1,
+        hideMenu:true
+      }
+    },
+    
     {
       path: '*',
       redirect:"/cityenergymap"

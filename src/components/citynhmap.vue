@@ -2,57 +2,57 @@
 <div class="nhpm-echart">
   <span class="echart-npmp-map" id="echart-npmp"></span>
   <span class="npmp-data">
-        <div class="nhmap-c-data">
-            <div class="nhmap-c-data-title">建筑能耗-电耗数据</div>
+        <div class="nhmap-c-data" :class="{actived:type==1}">
+            <div class="nhmap-c-data-title"><span style="font-size:20px" class="iconfont icon-shandian" @click="changeType(1)"></span>建筑能耗-电耗数据</div>
             <table class="nhmap-c-table">
                 <tr><th>时间</th><th>能耗种类</th><th>能耗数据</th></tr>
-                <tr><td>今日</td><td>电耗</td><td>{{info.dangTianData_power}}</td></tr>
-                <tr><td>昨天</td><td>电耗</td><td>{{info.zuoTianData_power}}</td></tr>
-                <tr><td>前天</td><td>电耗</td><td>{{info.qianTianData_power}}</td></tr>
-                <tr><td>本月</td><td>电耗</td><td>{{info.benYueData_power}}</td></tr>
-                <tr><td>上月</td><td>电耗</td><td>{{info.shangYueData_power}}</td></tr>
-                <tr><td>今年</td><td>电耗</td><td>{{info.benNianData_power}}</td></tr>
-                <tr><td>全部</td><td>电耗</td><td>{{info.quanBuData_power}}</td></tr>
+                <tr><td>今日</td><td>电耗</td><td>{{info.dangTianData_power||0}}kwh</td></tr>
+                <tr><td>昨天</td><td>电耗</td><td>{{info.zuoTianData_power||0}}kwh</td></tr>
+                <tr><td>前天</td><td>电耗</td><td>{{info.qianTianData_power||0}}kwh</td></tr>
+                <tr><td>本月</td><td>电耗</td><td>{{info.benYueData_power||0}}kwh</td></tr>
+                <tr><td>上月</td><td>电耗</td><td>{{info.shangYueData_power||0}}kwh</td></tr>
+                <tr><td>今年</td><td>电耗</td><td>{{info.benNianData_power||0}}kwh</td></tr>
+                <tr><td>上线至今</td><td>电耗</td><td>{{info.quanBuData_power||0}}kwh</td></tr>
             </table>
         </div>
-        <div class="nhmap-c-data">
-            <div class="nhmap-c-data-title">建筑能耗-水耗数据</div>
+        <div class="nhmap-c-data" :class="{actived:type==2}">
+            <div class="nhmap-c-data-title"><span style="font-size:20px"   class="iconfont icon-shui" @click="changeType(2)"></span>建筑能耗-水耗数据</div>
             <table class="nhmap-c-table">
                 <tr><th>时间</th><th>能耗种类</th><th>能耗数据</th></tr>
-                <tr><td>今日</td><td>水耗</td><td>{{info.dangTianData_wather}}</td></tr>
-                <tr><td>昨天</td><td>水耗</td><td>{{info.zuoTianData_wather}}</td></tr>
-                <tr><td>前天</td><td>水耗</td><td>{{info.qianTianData_wather}}</td></tr>
-                <tr><td>本月</td><td>水耗</td><td>{{info.benYueData_wather}}</td></tr>
-                <tr><td>上月</td><td>水耗</td><td>{{info.shangYueData_wather}}</td></tr>
-                <tr><td>今年</td><td>水耗</td><td>{{info.dangTianData_wather}}</td></tr>
-                <tr><td>全部</td><td>水耗</td><td>{{info.quanBuData_wather}}</td></tr>
+                <tr><td>今日</td><td>水耗</td><td>{{info.dangTianData_wather||0}}t</td></tr>
+                <tr><td>昨天</td><td>水耗</td><td>{{info.zuoTianData_wather||0}}t</td></tr>
+                <tr><td>前天</td><td>水耗</td><td>{{info.qianTianData_wather||0}}t</td></tr>
+                <tr><td>本月</td><td>水耗</td><td>{{info.benYueData_wather||0}}t</td></tr>
+                <tr><td>上月</td><td>水耗</td><td>{{info.shangYueData_wather||0}}t</td></tr>
+                <tr><td>今年</td><td>水耗</td><td>{{info.dangTianData_wather||0}}t</td></tr>
+                <tr><td>上线至今</td><td>水耗</td><td>{{info.quanBuData_wather||0}}t</td></tr>
             </table>
         </div>
         <br/>
-        <div class="nhmap-c-data">
-            <div class="nhmap-c-data-title">建筑能耗-气耗数据</div>
+        <div class="nhmap-c-data" :class="{actived:type==3}">
+            <div class="nhmap-c-data-title"><span class="iconfont icon-qiyou_gasoline" @click="changeType(3)"></span>建筑能耗-气耗数据</div>
             <table class="nhmap-c-table">
                 <tr><th>时间</th><th>能耗种类</th><th>能耗数据</th></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1}}</td></tr>
+                <tr><td>今日</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
+                <tr><td>昨天</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
+                <tr><td>前天</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
+                <tr><td>本月</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
+                <tr><td>上月</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
+                <tr><td>今年</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
+                <tr><td>上线至今</td><td>气耗</td><td>{{info.benNianData_power1||0}}m³</td></tr>
             </table>
         </div>
-        <div class="nhmap-c-data">
-            <div class="nhmap-c-data-title">建筑能耗-油耗数据</div>
+        <div class="nhmap-c-data" :class="{actived:type==4}">
+            <div class="nhmap-c-data-title"><span class="iconfont icon-qiyou_gasoline" @click="changeType(4)"></span>建筑能耗-油耗数据</div>
             <table class="nhmap-c-table">
                 <tr><th>时间</th><th>能耗种类</th><th>能耗数据</th></tr>
-                <tr><td>今日</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>昨天</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>前天</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>本月</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>上月</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>今年</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
-                <tr><td>全部</td><td>油耗</td><td>{{info.benNianData_power1}}</td></tr>
+                <tr><td>今日</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
+                <tr><td>昨天</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
+                <tr><td>前天</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
+                <tr><td>本月</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
+                <tr><td>上月</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
+                <tr><td>今年</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
+                <tr><td>上线至今</td><td>油耗</td><td>{{info.benNianData_power1||0}}L</td></tr>
             </table>
         </div>
     </span>
@@ -65,8 +65,10 @@ export default {
   name: "demo1",
   data() {
     return {
+      type:1,
       info:{},
-      msg: ""
+      msg: "",
+      mapdata:{},
     };
   },
   methods: {
@@ -83,7 +85,11 @@ export default {
               item,
             })
           }
-          this.builderChart(list)
+          this.mapdata = list
+          this.getInfo(list.map(ele=>{
+            return ele.item.cityid
+          }))
+          this.builderChart()
         }
       }).catch(e => {
 
@@ -100,9 +106,32 @@ export default {
 
       })
     },
-    builderChart(data) {
-
-
+    changeType(type){
+      this.type = type
+      this.builderChart()
+    },
+    builderChart() {
+            var name = "电耗"
+            var str = "powertotal"
+            if(this.type == 1){
+              str = "powertotal"
+              name = "电耗"
+            }else if(this.type == 2){
+              str = "wathertotal"
+              name = "水耗"
+            }else if(this.type == 3){
+              str = "gastotal"
+              name = "气耗"
+            }else if(this.type == 4){
+              str = "oiltotal"
+              name = "油耗"
+            }
+            var data = this.mapdata.map(ele=>{
+              return {
+                ...ele,
+                value:[...ele.value,ele.item[str]]
+              }
+            })
 
 
             var echarts = require('echarts/lib/echarts');
@@ -110,9 +139,12 @@ export default {
             require('echarts/lib/component/toolbox');
             require('echarts/lib/component/title');
             require("echarts/lib/component/grid");
+require("echarts/lib/component/visualMap");
+            
             require("echarts/lib/component/dataZoom");
             require("echarts/lib/component/geo");// 地理
-            require("echarts/map/js/china");
+
+            require("echarts/map/js/province/guangxi.js");
       let myChart = echarts.init(document.getElementById("echart-npmp"));
       
       myChart.on('brushselected', (params)=> {
@@ -135,14 +167,28 @@ export default {
 
       });
 
+      var max = Math.max.apply(null,data.map(ele=>{return parseInt(ele.value[2])||0}))||1;
       let option = {
-        
+        visualMap: {
+            min: 0,
+            max: max,
+            text:['高','低'],
+            realtime: false,
+            calculable: true,
+            inRange: {
+                color: ['lightskyblue','yellow', 'orangered']
+            },
+            textStyle:{
+              color:'#fff'
+            }
+        },
         tooltip: {
           trigger: "item",
           formatter: function(params) {
-            return params.name 
+            return  `${name}<br>${params.name}:${params.value[2]}`
           }
         },
+
         brush: {
           toolbox: ['rect', 'polygon'],
           throttleType:'debounce'
@@ -150,7 +196,7 @@ export default {
         },
         geo: {
          
-          map: "china",
+          map: "广西",
           label: {
             emphasis: {
               show: false
@@ -158,21 +204,30 @@ export default {
           },
           itemStyle: {
             normal: {
-              areaColor: "#003f55",
+              areaColor: this.$thime=='thime3'?"#151d4e":"#003f55",
               borderColor: "#005565"
             },
             emphasis: {
-              areaColor: "#2a333d"
+              areaColor: this.$thime=='thime3'?"#4285f3":"#2a333d"
             }
           }
         },
         series: [{
-          name: "pm2.5",
+          name:name,
           type: "scatter",
           coordinateSystem: "geo",
           color: "#ffee26",
           data: data,
-          symbolSize: 12,
+          symbolSize: function (val) {
+                var rv = val[2] / 400;
+                if(rv >18){
+                  rv = 18
+                } 
+                if(rv<3){
+                  return 3
+                }
+                return rv
+            },
           label: {
             normal: {
               show: false
@@ -245,7 +300,10 @@ export default {
   color: #333;
   margin-bottom: 10px;
 }
-
+.nhmap-c-data-title .iconfont{
+  font-size: 30px;
+    vertical-align: middle;
+}
 .nhmap-c-data table {
   border-color: #ddd;
   border-radius: 5px;
@@ -270,5 +328,8 @@ export default {
 .nhmap-c-data table th {
   border-bottom: 1px solid #ddd;
   text-align: left;
+}
+.actived .iconfont{
+  color:#f28a24;
 }
 </style>

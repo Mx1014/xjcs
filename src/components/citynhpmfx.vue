@@ -1,6 +1,6 @@
 <template>
 <div class="map-view">
-    <div class="xjcs-c-aside">
+    <div class="xjcs-c-aside nhfx">
         <div class="xjcs-c-title">
             选择级别:<select v-model="sellevel" @change="sellevelChange">
                 <option value="1">区</option>
@@ -10,6 +10,7 @@
         </div>
         <div>
              <Tree ref="tree" :data="treeList" show-checkbox @on-check-change="checkchange">></Tree>
+                       
           </div>
       </div>
       <div class="xjcs-c-content">
@@ -48,6 +49,9 @@
             <!-- <div id="echart_nhzl" class="echart_nhpmfx"></div> -->
             <div>
                 <Table :columns="cols" :data="dataList"></Table>
+                   <div class="export-data">
+                     <a :href="exporturl" target="_blank">导出数据</a>
+                </div>
             </div>
         </div>
       </div>
@@ -284,8 +288,14 @@ export default {
             }).then(res=>{
                 if(res.data.status=="ok")
                 // this.buildchart(res.data.lists)
-                this.buildchart2(res.data.lists)
+                (res.data.lists||[]).sort((a,b)=>{
+                    return parseFloat(b.origvalue)-parseFloat(a.origvalue)
+                })
+                this.buildchart2([...res.data.lists])
                 this.buildTable(res.data.lists)
+            }).catch(e=>{
+                this.buildchart2([])
+                this.buildTable([])
             })
         },
          checkchange(e){
@@ -317,14 +327,16 @@ export default {
                     }
                 ]
             let index = 0
+            
             let list = data.map((ele)=>{
                 return {
                     index:++index,
                     name:ele.name,
-                    value:ele.origvalue
+                    value:(ele.origvalue||0)+{"1":"kwh","2":"t","3":"m³","4":"L"}[this.energy_type]+{1:"",2:"/人",3:"/㎡"}[this.selete_type]
                 }
             })
-
+            console.log(list,1488878)
+            
             this.dataList = list
         },
         buildchart(data){
@@ -367,7 +379,7 @@ export default {
                 data: span
             },
             yAxis: {
-                 name:{"1":"电耗(kwh)","2":"水耗(t)","3":"气耗(m³)","4":"油耗(L)"}[this.energy_type],
+                 name:{"1":"电耗(kwh)","2":"水耗(t)","3":"气耗(m³)","4":"油耗(L)"}[this.energy_type]+{1:"",2:"/人",3:"/㎡"}[this.selete_type],
             },
             series: [
                 {
@@ -398,6 +410,8 @@ export default {
             let cdata = data.map(ele=>{
                 return ele.origvalue
             })
+            var color = this.$thime=='thime3'?"#ddd":"#000"
+                        color = this.$thime=='thime4'?"#ddd":color
                var echarts = require('echarts/lib/echarts');
             require('echarts/lib/component/tooltip');
             require('echarts/lib/component/toolbox');
@@ -413,9 +427,14 @@ export default {
                 let option = {
                     left:15,
             title: {
-                text: "耗能top"+num
+                text: "耗能top"+num,
+                textStyle:{
+                        color,
+                    },
             },
             toolbox: {
+                    left:'80%',
+                    right:20,
                     show: true,
                     feature: {
 
@@ -430,10 +449,41 @@ export default {
                 left:60
             },
             xAxis: {
-                data: span
+                data: span,
+                 axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
             },
             yAxis: {
-                name:{"1":"电耗(kwh)","2":"水耗(t)","3":"气耗(m³)","4":"油耗(L)"}[this.energy_type],
+                name:{"1":"电耗(kwh","2":"水耗(t","3":"气耗(m³","4":"油耗(L"}[this.energy_type]+{1:"",2:"/人",3:"/㎡"}[this.selete_type]+")",
+                nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    },
+                     splitLine:{
+                        lineStyle:{
+                            color:'#666'
+                        }
+                    }
+                    
             },
             series: [
                 {
@@ -467,6 +517,26 @@ export default {
             if(this.time_type==4){
                 return "datetime"
             }
+        },
+        exporturl(){
+             let times = this.date[1].getTime() - this.date[0].getTime()
+            let day = 24*3600*1000
+            let time_type = 3
+            if(times>day&&times<=day*30){
+                time_type = 2
+            }
+            if(times>30*day){
+                time_type = 1
+            }
+            let start_time = this.getStartDate(this.date[0])
+            let end_time = this.getEndDate(this.date[1])
+            let statis_type = "1"
+            let selete_type   = this.selete_type  
+            let energy_type = this.energy_type
+            let quota_type = "1"
+            let contrasts  = this.ids.join(',')
+            let level  = this.sellevel
+           return `/Index/ranking_analysis_data?import=outexcel&start_time=${start_time}&end_time=${end_time}&statis_type=${statis_type}&selete_type=${selete_type}&energy_type=${energy_type}&quota_type=${quota_type}&contrasts=${contrasts}&level=${level}&time_type=${time_type}`
         }
     },
     mounted() {

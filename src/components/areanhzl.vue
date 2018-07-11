@@ -11,7 +11,7 @@
                 <span class="xjcs-city-title">能耗曲线</span>
                 <span class="xjcs-city-type"><span @click="changeEntype('电能')" :class="{actived:enType=='电能'}">电能</span><span @click="changeEntype('水能')" :class="{actived:enType=='水能'}">水能</span><span @click="changeEntype('气能')" :class="{actived:enType=='气能'}">气能</span><span @click="changeEntype('油能')" :class="{actived:enType=='油能'}">油能</span></span>
                 <span class="xjcs-city-time"><span @click="changeDatetype(0)" :class="{actived:dateType=='0'}">日</span><span @click="changeDatetype(1)" :class="{actived:dateType=='1'}">月</span><span @click="changeDatetype(2)" :class="{actived:dateType=='2'}">年</span></span>
-                <span class="xjcs-city-date" v-show="dateType=='0'"> <DatePicker @on-change="getData()" v-model="datetime"  placeholder="" style="width: 200px"></DatePicker></span>       
+                <span class="xjcs-city-date" v-show="dateType=='0'"> <DatePicker @on-change="intChart=0; getData()" v-model="datetime"  placeholder="" style="width: 200px"></DatePicker></span>       
             </div>
         </div>
         <div style="position:relative">
@@ -20,13 +20,17 @@
             <span v-show="intChart>0" class="iconfont icon-jiantou jtright" @click="intChart-=1;getData()"></span>
             <div>
                 <Table :columns="cols" :data="dataList"></Table>
+                <div class="export-data">
+                    <a :href="`/Index/get_region_data_by_time?import=outexcel&intChart=${intChart}&time_type=${dateType}&energy_type=${enType}&datetime=${dateType==0?datetime.format('yyyy-MM-dd 00:00:00'):''}&emp_code=${selnode.value}`" target="_blank">导出数据</a>
+                </div>
             </div>
         </div>
     </div>
-    <!-- <div class="xjcs-c-right">
+    <div class="xjcs-c-right">
         <div id="echart-nhzl-1" class="echart-nhzl-1"></div>
+        <div id="echart-nhzl-t" class="echart-nhzl-t">与{{{0:"昨日",1:"上月",2:"去年"}[dateType]}}此时同比{{con_bfb>=0?'增长':"降低"}}{{(con_bfb>0?con_bfb:((0-con_bfb))*100||0.00).toFixed(2) + '%'}}</div>
         <div id="echart-nhzl-2" class="echart-nhzl-2"></div>
-    </div> -->
+    </div>
 </div>
 </template>
 
@@ -44,6 +48,7 @@ export default {
             enType: "电能",
             dateType: 0,
             treeList: [],
+            con_bfb:0,
             intChart:0,
             datetime:new Date(),
             selnode: {},
@@ -93,14 +98,21 @@ export default {
                 }
             })
             return [{
-                title: "分类",
+                title: "区域",
                 key: "name",
                 width: 120,
-            }, {
-                title: "分类合计",
+                 fixed:'left',
+            },{
+                title: "日期",
+                key: "date",
+                width: 120,
+                  fixed:'left',
+                  className:"col-heignlight"
+            }, ...list, {
+                title: "合计",
                 key: "elect_each_all",
                 width: 120,
-            }, ...list]
+            }]
         }
     },
     methods: {
@@ -109,10 +121,12 @@ export default {
         },
         changeEntype(type) {
             this.enType = type
+            this.intChart=0;
             this.getData()
         },
         changeDatetype(type) {
             this.dateType = type
+            this.intChart=0;
             this.getData()
         },
         selectchange(e) {
@@ -148,7 +162,7 @@ export default {
                          disabled:lv!=3,
                         children:_buildChildren(ele.regList,lv+1)
                     }
-                     if(index == 0&&lv==3){
+                      if(index==0&&lv==3&&!this.selnode.value){
                         obj.selected= true
                         this.selnode = obj
                     }
@@ -182,31 +196,70 @@ export default {
                 }
             }).then(res => {
                 if(this.enType == "气能"||this.enType == "油能"){
-                    res.data= {"elect_node_id":"1","cityname":"\u767e\u8272\u5e02","water_node_id":"30001","node_id":"1","title":"2018-01-04","energy_today":0,"energy_yesterday":0,"energy_lastyeartoday":0,"energy_today_list":{"name":"","data":[]},"energy_yesterday_list":{"name":"2018-01-03","data":[]},"energy_lastyeartoday_list":null,"energy_chartdata_list":[{"name":"2018-01-04","data":[]},{"name":"2018-01-03","data":[]}],"energy_department_energy_arr":[{"value":[]}]}
-
+                    res.data = {
+                        "elect_node_id": "1",
+                        "cityname": "\u767e\u8272\u5e02",
+                        "water_node_id": "30001",
+                        "node_id": "1",
+                        "title": "",
+                        "energy_today": 0,
+                        "energy_yesterday": 0,
+                        "energy_lastyeartoday": 0,
+                        "energy_today_list": {
+                            "name": "",
+                            "data": []
+                        },
+                        "energy_yesterday_list": {
+                            "name": "",
+                            "data": []
+                        },
+                        "energy_lastyeartoday_list": null,
+                        "energy_chartdata_list": [{
+                            "name": "",
+                            "data": []
+                        }, {
+                            "name": "",
+                            "data": []
+                        }],
+                        "energy_department_energy_arr": [{
+                            "value": []
+                        }]
+                    }
                 }
                 this.buildchart(res.data)
-                               
-                // this.setRight1([res.data.energy_lastyeartoday, res.data.energy_yesterday, res.data.energy_today])
-                // this.setRight2(res.data.energy_department_energy_arr)
-                 this.buildTable(res.data.energy_department_energy_arr)
+                            this.con_bfb = parseFloat(res.data.con_bfb)||0   
+                this.setRight1([res.data.energy_lastyeartoday, res.data.energy_yesterday, res.data.energy_today])
+  this.setRight2([res.data.con_yesday_total,res.data.con_day_total])
+                 this.buildTable(res.data.energy_department_energy_arr,res.data.title)
                 console.log(res)
             }).catch(e => {
                 console.log(e)
             })
         },
-        buildTable(list) {
+        buildTable(list,date) {
             let rlist = []
             list.forEach(ele => {
                 let obj = {}
                 let i = 0
                 ele.value.forEach(item => {
                     i++
-                    obj[i] = item.value
+                    obj[i] = item.value+{
+                        "电能": "kwh",
+                        "水能": "t",
+                        "气能": "m³",
+                        "油能": "L"
+                    }[this.enType]
                 })
+                
                 rlist.push({
+                    date,
                     name: ele.name,
-                    elect_each_all: ele.elect_each_all,
+                    elect_each_all: ele.elect_each_all+{
+                        "电能": "kwh",
+                        "水能": "t",
+                        "气能": "m³",
+                        "油能": "L"
+                    }[this.enType],
                     ...obj
                 })
 
@@ -215,7 +268,8 @@ export default {
             this.dataList = rlist
         },
         buildchart(data) {
-            
+            var color = this.$thime=='thime3'?"#4285f3":"#000"
+            color = this.$thime=='thime4'?"#24936e":color
             var echarts = require('echarts/lib/echarts');
             require('echarts/lib/component/tooltip');
             require('echarts/lib/component/toolbox');
@@ -224,7 +278,8 @@ export default {
             require("echarts/lib/component/dataZoom");
             require("echarts/lib/chart/line"); //线
             require("echarts/lib/chart/bar"); //线
-            var myChart = echarts.init(document.getElementById("echart_nhzl"));
+            var thime = this.$thime=='thime3'?"light":"default"
+            var myChart = echarts.init(document.getElementById("echart_nhzl"),thime);
 
             let option = {
                 tooltip: {
@@ -236,11 +291,18 @@ export default {
                 title:{
                 top:5,
                 left:10,
-                text:this.selnode.title
+                text:this.selnode.title,
+                textStyle:{
+                        color,
+                    },
             },legend: {
-                    data:[data.energy_chartdata_list[0].name,data.energy_chartdata_list[1].name]
+                    data:[data.energy_chartdata_list[0].name,data.energy_chartdata_list[1].name],
+                     textStyle:{
+                        color,
+                    },
                 },
                 toolbox: {
+                    left:"90%",
                     show: true,
                     feature: {
 
@@ -261,11 +323,41 @@ export default {
                     data: this.span,
                     axisTick: {
                         alignWithLabel: true
+                    },
+                    axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
                     }
                 }],
                 yAxis: [{
                     name:{"电能":"电耗(kwh)","水能":"水耗(t)","气能":"气耗(m³)","油能":"油耗(L)"}[this.enType],
-                    type: 'value'
+                    type: 'value',
+                    nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    },
+                    splitLine:{
+                        lineStyle:{
+                            color:'#666'
+                        }
+                    }
                 }],
                 grid: {
                     left: '3%',
@@ -287,7 +379,18 @@ export default {
                 name:data.energy_chartdata_list[0].name,
                 data: data.energy_chartdata_list[0].data,
                 type: 'line',
-                smooth: true
+                smooth: true,
+                areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: 'rgb(68, 158, 255)'
+                            }, {
+                                offset: 0.7,
+                                color: 'rgba(68, 158, 255,0.1)'
+                            }])
+                        }
+                    },
             },{
                 name:data.energy_chartdata_list[1].name,
                 data: data.energy_chartdata_list[1].data,
@@ -298,6 +401,8 @@ export default {
             myChart.setOption(option);
         },
         setRight1(data) {
+            var color = this.$thime=='thime3'?"#ddd":"#000"
+            color = this.$thime=='thime4'?"#ddd":color
             console.log(data)
                           var echarts = require('echarts/lib/echarts');
             require('echarts/lib/component/tooltip');
@@ -308,14 +413,34 @@ export default {
             require("echarts/lib/chart/line"); //线
             require("echarts/lib/chart/bar"); //线
             let all = (parseFloat(data[0])?parseFloat(data[0]):0)+(parseFloat(data[1])?parseFloat(data[1]):0)+(parseFloat(data[2])?parseFloat(data[2]):0)
-            var builderJson = {
+             var builderJson = {
                 "all": all,
                 "charts": {
-                    ["今日"+(this.enType=='电能'?"电耗":"水耗")]: data[2],
-                    ["昨日"+(this.enType=='电能'?"电耗":"水耗")]: data[1],
-                    ["去年今日"+(this.enType=='电能'?"电耗":"水耗")]:data[0]
+                    ["今"+{0:"日",1:"月",2:"年"}[this.dateType] + ({
+                        "电能": "电耗(kwh)",
+                        "水能": "水耗(t)",
+                        "气能": "气耗(m³)",
+                        "油能": "油耗(L)"
+                    }[this.enType])]: data[2],
+                    [{0:"昨日",1:"上月",2:"去年"}[this.dateType] + ({
+                        "电能": "电耗(kwh)",
+                        "水能": "水耗(t)",
+                        "气能": "气耗(m³)",
+                        "油能": "油耗(L)"
+                    }[this.enType])]: data[1]
                 }
             };
+            if(this.dateType!=2){
+                builderJson.charts = {
+                    ...builderJson.charts,
+                    ["去年今"+{0:"日",1:"月",2:"年"}[this.dateType] + ({
+                        "电能": "电耗(kwh)",
+                        "水能": "水耗(t)",
+                        "气能": "气耗(m³)",
+                        "油能": "油耗(L)"
+                    }[this.enType])]: data[0]
+                }
+            }
             var myChart = echarts.init(document.getElementById("echart-nhzl-1"));
             let option = {
                 grid: [{
@@ -335,22 +460,39 @@ export default {
                     max: builderJson.all,
                     splitLine: {
                         show: false
-                    }
+                    },
+                     axisLabel: {
+                        textStyle:{
+                            color:color
+                        }
+                        
+                    },
                 }],
                 yAxis: [{
                     type: "category",
                     data: Object.keys(builderJson.charts),
-                    axisLabel: {
-                        interval: 0
+                   axisLabel: {
+                        interval: 0,
+                        textStyle:{
+                            color:color
+                        }
+                        
                     },
                     axisTick: {
                         show: false
                     },
-                    axisLine: {
-                        show: false
+                    axisLine:{
+                        show:false,
+                        lineStyle:{
+                            color:'#666'
+                        }
+                        
                     },
-                    splitLine: {
-                        show: false
+
+                    splitLine:{
+                        lineStyle:{
+                            color:'#666'
+                        }
                     }
                 }],
                 series: [{
@@ -362,6 +504,7 @@ export default {
                         normal: {
                             position: "right",
                             show: true,
+                            color
                          
                         }
                     },
@@ -385,21 +528,23 @@ export default {
             // 使用刚指定的配置项和数据显示图表。
             myChart.setOption(option);
         },
-        setRight2(data) {
+         setRight2(data) {
 
-            let span = data.map(ele=>{
-                return 
-                    ele.name
+            // let span = data.map(ele=>{
+            //     return ["去年今日","昨日","今日"]
                 
-            })
-            let csdata = data.map(ele=>{
-                return {
-                    name :ele.name,
-                    value : ele.elect_each_all
-                }
+            // })
+            // let i = 0
+            // let csdata = data.map(ele=>{
+            //     return {
+            //         name:["去年今日","昨日","今日"][i++],
+            //         value:ele
+            //     }
+                
+            // })
                     
-                
-            })
+             var color = this.$thime=='thime3'?"#ddd":"#000"
+             color = this.$thime=='thime4'?"#ddd":color
             var echarts = require('echarts/lib/echarts');
             require('echarts/lib/component/tooltip');
             require('echarts/lib/component/toolbox');
@@ -412,49 +557,110 @@ export default {
 
                 tooltip: {
                     trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    formatter: "{a} <br/>{b} : {c}"
+                },
+                titie:{
+                    text:"<span>对比增长</span>",
+                     textStyle:{
+                        color,
+                    },
                 },
                 /* legend: {
                     x : 'center',
                     y : 'bottom',
                     data:['照明插座系统用电','照明插座系统用电2','照明插座系统用电3','照明插座系统用电4']
                 }, */
-                series: [{
-                    name: '分类统计',
-                    type: 'pie',
-                    radius: ['40', '80'],
-                    center: ['50%', '50%'],
-                    color: ['#f6da22', '#bbe2e8', '#6cacde', '#3394f2', '#f20376'],
-                    data: csdata,
-                    roseType: 'radius',
-                     label: {
-                        normal: {
-                            formatter: '{b|{b}：}{c}   ',
-                            borderColor: '#aaa',
-                            borderWidth: 0,
-                            rich: {
-                            
-                                b: {
-                                    fontSize: 12,
-                                    lineHeight: 16
-                                }
-        
-                            }
+                xAxis: {
+                    type: 'category',
+                      data: [{0:"昨日",1:"上月",2:"去年"}[this.dateType], {0:"今日",1:"今月",2:"今年"}[this.dateType],],
+                      axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
                         }
                     },
-                    itemStyle: {
-                        normal: {
-                            shadowBlur: 10,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                        }
+                    axisLine:{
+                        show:false
                     },
-
-                    animationType: 'scale',
-                    animationEasing: 'elasticOut',
-                    animationDelay: function(idx) {
-                        return Math.random() * 200;
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
                     }
+                },
+                yAxis: {
+                    name:{"电能":"电耗(kwh)","水能":"水耗(t)","气能":"气耗(m³)","油能":"油耗(L)"}[this.enType],
+                    type: 'value',
+                    nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false,
+                        lineStyle:{
+                            color:'#666'
+                        }
+                        
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    },
+                    splitLine:{
+                        lineStyle:{
+                            color:'#666'
+                        }
+                    }
+                },
+                series: [{
+                    name:{"电能":"电耗","水能":"水耗","气能":"气耗","油能":"油耗"}[this.enType],
+                    data: data,
+                    type: 'bar',
+                    barWidth:20,
+                    label: {
+                    normal: {
+                        show: true,
+                        formatter: '{c}',
+                        position: 'top',
+                            color
+                    }
+                },
                 }]
+                // series: [{
+                //     name: '耗能同比',
+                //     type: 'pie',
+                //     radius: ['40', '80'],
+                //     center: ['50%', '50%'],
+                //     data: csdata,
+                //     roseType: 'radius',
+                //      label: {
+                //         normal: {
+                //             formatter: '{b|{b}：}\n{c}   ',
+                //             borderColor: '#aaa',
+                //             borderWidth: 0,
+                //             rich: {
+                            
+                //                 b: {
+                //                     fontSize: 12,
+                //                     lineHeight: 16
+                //                 }
+        
+                //             }
+                //         }
+                //     },
+                //     itemStyle: {
+                //         normal: {
+                //             shadowBlur: 10,
+                //             shadowColor: 'rgba(0, 0, 0, 0.5)'
+                //         }
+                //     },
+
+                //     animationType: 'scale',
+                //     animationEasing: 'elasticOut',
+                //     animationDelay: function(idx) {
+                //         return Math.random() * 200;
+                //     }
+                // }]
             };
 
             // 使用刚指定的配置项和数据显示图表。

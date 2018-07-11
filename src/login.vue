@@ -1,7 +1,7 @@
 <template>
 <div class="login-c" @keyup.enter="login">
   <div class="login">
-    <span class="login-left">
+    <!-- <span class="login-left">
             <transition name="slide-fade">
           <img :src="login_img1" alt="" v-show="showIndex == 0">
            </transition>
@@ -11,19 +11,23 @@
               <transition name="slide-fade">
             <img :src="login_img3" alt=""  v-show="showIndex == 2">
              </transition>
-        </span>
+        </span> -->
+        
+         <div class="login-title">城市节能监测管理平台</div>
     <span class="login-right">
-            <div class="login-title">城市节能监测管理平台</div>
+           
             <div class="login-center">
-              <label for="">账号</label><input v-model="user" type="text" />
+             <input v-model="user" type="text" placeholder="账户/用户名"/>
             </div>
              <div class="login-center">
-              <label for="">密码</label><input v-model="pwd" type="password" />
+             <input v-model="pwd" type="password" placeholder="密码"/>
             </div>
              <div class="login-bt" @click="login">
-              <Button :loading="loading" class="login-bt-span" >立即登录</Button>
+              <Button :loading="loading" class="login-bt-span" >登录</Button>
   </div>
+<!-- <div class="sanjiao"></div> -->
   </span>
+  
 </div>
 </div>
 </template>
@@ -68,7 +72,14 @@ export default {
       }).then(res=>{
         this.loading = false
         if(res.data.status==1){
-          location.href = 'index.html#/cityenergymap'
+          localStorage.setItem("manager",res.data.manager||1)
+          if(res.data.manager == 2){
+            location.href = 'index.html#/areaenergyoverview'
+          }else{
+            location.href = 'index.html#/cityenergymap'
+          }
+          
+          
         }else{
           Message.warning(res.data.msg)
         }
@@ -97,9 +108,9 @@ export default {
   height: 100%;
   width: 100%;
   display: flex;
-  align-items: center;
+  color:#00d9ed;
   justify-content: center;
-  background: #f1f7f8;
+  background: url(./assets/login-bg.jpg);
 }
 
 .login-left {
@@ -113,13 +124,18 @@ export default {
 }
 
 .login-right {
+  margin-top:-30px;
+  position:relative;
   display: inline-block;
   vertical-align: top;
-  height: 100%;
-  width: 480px;
+  width: 660px;
+  height: 440px;
+  background: url(./assets/login-top-sanjiao.png) no-repeat;
+  background-size:100% 100%;
+  border-radius:10px;
   box-sizing: border-box;
-  margin: 0;
   text-align: center;
+  padding-top:120px;
 }
 
 .login-left img {
@@ -131,23 +147,25 @@ export default {
 }
 
 .login {
-  width: 1160px;
-  height: 540px;
-  background: #fff;
-  box-shadow: rgba(0, 0, 0, 0.3) 1px 2px 10px;
+  text-align:center;
+  
 }
 
 .login-title {
-  color: #f28a24;
-  font-size: 33px;
-  margin-top: 100px;
-  padding-bottom: 20px;
+  color: #00d9ed;
+  font-size: 32px;
+  margin-top: 250px;
+  margin-left:25px
 }
-
+@media screen and (max-width: 1365px) {
+   .login-title {
+margin-top: 100px;
+}
+}
 .login-center {
-  margin-top: 40px;
-  color: #f28a24;
-  font-size: 16px;
+  margin-bottom: 35px;
+  color: #00d9ed;
+  font-size: 20px;
 }
 
 .login-center label {
@@ -156,36 +174,70 @@ export default {
 }
 
 .login-center input {
-  width: 300px;
+  width: 420px;
   padding: 3px 10px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 2px;
-  height: 30px;
+  border:none;
+  outline:none;
+  background: rgba(255, 255, 255, 0);
+  box-shadow:0px 7px 12px rgba(0, 0, 0, 0.3), 0px -1px 3px rgba(255, 255, 255, 1);
+  height: 50px;
+  border-radius: 5px;
+  line-height:0px;
+  color: #00d9ed;
+  box-sizing:border-box;
 }
 
 .login-bt {
   cursor: pointer;
-  margin-top: 40px;
+  margin-top: 65px;
 }
 
 .login-bt .login-bt-span {
   display: inline-block;
-  background: #f28a24;
-  width: 300px;
-  padding: 10px 0px;
-  font-size: 14px;
-  margin-left: 60px;
-  color: #fff;
+  width: 420px;
+ padding: 3px 10px;
+   background: rgba(255, 255, 255, 0);
+   box-shadow:0px 7px 12px rgba(0, 0, 0, 0.3), 0px -1px 3px rgba(255, 255, 255, 1);
+  font-size: 20px;
+  border-radius: 5px;
+  border:none;
+  outline:none;
+   height: 50px;
+  line-height:50px;
+  color: #00d9ed;
   outline: none
 }
-
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #00d9ed;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #00d9ed;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #00d9ed;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:    #00d9ed;
+}
 html,
 body {
   height: 100%;
 }
 
-
+.sanjiao{
+  border-top:1px solid rgba(255,255,255,1);
+  border-right:1px solid rgba(255,255,255,1);
+  border-bottom:1px solid transparent;
+  border-left:1px solid transparent;
+  transform:rotate(-45deg);
+  background:url(./assets/login-bg.jpg) center center;
+  opacity:.5;
+  position:absolute;
+  top:-10px;
+  left:300px;
+  width:20px;
+  height:20px;
+}
 /* 可以设置不同的进入和离开动画 */
 
 

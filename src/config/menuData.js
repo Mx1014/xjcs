@@ -1,19 +1,17 @@
 export default [
   {
-    title: "城市能耗",
-    icon: "icon-baojing",
-    children:[{
-        title: "城市能耗地图",
+    title: "能耗地图",
+    icon: "icon-ditu",
+    manager:2,
         name:"cityenergymap",
-        icon: "",
         url: "/cityenergymap",
-    }]
   },
   {
     title: "能耗计量",
     icon: "icon-zonglan",
     children:[{
         title: "能耗总览",
+        manager:2,
         name:"cityenergyoverview",
         icon: "",
         url: "/cityenergyoverview",
@@ -79,7 +77,7 @@ export default [
     title: "能耗考核",
     icon: "icon-kaohe",
     children:[{
-        title: "能耗pue",
+        title: "能耗PUE",
          name:"energypue",
         icon: "",
         url: "/energypue",
@@ -89,42 +87,54 @@ export default [
      name:"energyquotasetting",
     icon: "",
     url: "/energyquotasetting",
-},{
-  title: "能耗超标预警",
-   name:"energywarning",
-  icon: "",
-  url: "/energywarning",
-}]
+}
+// ,{
+//   title: "能耗超标预警",
+//    name:"energywarning",
+//   icon: "",
+//   url: "/energywarning",
+// }
+]
   },
   {
-    title: "环境信息查询",
+    title: "环境信息",
     icon: "icon-huanjingxinxi",
-    children:[{
-        title: "环境信息查询",
+    manager:2,
          name:"environmentinfo",
-        icon: "",
+
         url: "/environmentinfo",
-    }]
   },
   {
     title: "机构信息",
     icon: "icon-jianzhu",
-    children:[{
-        title: "机构信息",
+
          name:"buildinginfo",
-        icon: "",
         url: "/buildinginfo",
-    }]
   },
   {
-    title: "系统配置",
+    title: "系统管理",
     icon: "icon-shezhi",
     children:[{
         title: "系统配置",
          name:"systemconfig",
         icon: "",
+        manager:2,
         url: "/systemconfig",
-    }]
+    },
+    {
+      title: "人员管理",
+       name:"usermanager",
+      icon: "",
+      manager:2,
+      url: "/usernamager",
+  },
+    {
+      title: "警报列表",
+       name:"warnlist",
+      icon: "",
+      url: "/warnlist",
+  }
+  ]
   },
   
 

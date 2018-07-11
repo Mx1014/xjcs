@@ -1,6 +1,6 @@
 <template>
 <div class="map-view">
-    <div class="xjcs-c-aside">
+    <div class="xjcs-c-aside nhfx">
         <div class="xjcs-c-title">
             选择级别:<select v-model="sellevel" @change="sellevelChange">
                 <option value="1">区</option>
@@ -323,6 +323,8 @@ export default {
                     this.buildchart(res.data.lists,time_type)
                 }
                 
+            }).catch(e=>{
+                this.buildchart([],0)
             })
         },
          checkchange(e){
@@ -373,6 +375,8 @@ export default {
 
    
             })
+             var color = this.$thime=='thime3'?"#4285f3":"#000"
+             color = this.$thime=='thime4'?"#24936e":color
                    var echarts = require('echarts/lib/echarts');
             require('echarts/lib/component/tooltip');
             require('echarts/lib/component/toolbox');
@@ -383,10 +387,12 @@ export default {
             require("echarts/lib/chart/line"); //线
             require("echarts/lib/chart/bar"); //线
                require("echarts/lib/chart/pie"); //线
-        var myChart = echarts.init(document.getElementById("echart_nhdbfx"));
-
-
-        let series = data.map(ele=>{
+        var thime = this.$thime=='thime3'?"light":"default"
+        var myChart = echarts.init(document.getElementById("echart_nhdbfx"),thime);
+        myChart.clear()
+        console.log(data,1110100)
+        let series = []
+        series = data.map(ele=>{
             return {
                 name:ele.name,
                 stack: '能耗',
@@ -395,25 +401,108 @@ export default {
                 itemStyle: {
 
                 },
+
                 data: (ele.origlist||[]).map(item=>{
                     return item.origvalue
                 })
             }
         })
+        series.push(
+{
+            name:'面积模式',
+            type:'pie',
+            radius : [30, 110],
+            center : ['80%', '50%'],
+            roseType : 'area',
+            
+            label: {
+                        normal: {
+                            formatter: '{b|{b}：}\n{d}%  ',
+                            borderColor: '#aaa',
+                            borderWidth: 0,
+                            rich: {
+                            
+                                b: {
+                                    fontSize: 12,
+                                    lineHeight: 16
+                                }
+        
+                            }
+                        }
+                    },
+            data:cdata
+        }
+        )
+         console.log(series,1110101)
         let option = {
-            tooltip: {},
+            tooltip: {
+                    trigger: 'item',
+                    formatter:(params)=> {
+                        console.log(params)
+                        return `<span style="background:${params.color};width:12px;height:12px;display:inline-block;border-radius:50%;vertical-align: middle;"></span>${(params.componentSubType=='bar'?params.seriesName+" ":" ")+ params.name}<br>
+                        &nbsp;&nbsp;&nbsp;${params.value}`+{"1":"kwh","2":"t","3":"m³","4":"L"}[this.energy_type];
+                    }
+                    
+                },
             legend: [{
-                data:cspan
+                data:cspan,
+                textStyle:{
+                            color:color
+                        }
             },{
-                data:cspan
+                data:cspan,
+                textStyle:{
+                            color:color
+                        }
             }],
             xAxis: {
-                data: span
+                data: span,
+                axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
             },
+            dataZoom: [{
+                type: "slider",
+                width: '30%',
+                show: true,
+                start: 0,
+                end: 34,
+                zoomLock: true,
+                left: '30%',
+                top: '95%'
+            }],
             yAxis: {
                   name:{"1":"电耗(kwh)","2":"水耗(t)","3":"气耗(m³)","4":"油耗(L)"}[this.energy_type],
+                  nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    },
+                     splitLine:{
+                        lineStyle:{
+                            color:'#666'
+                        }
+                    }
             },
             toolbox: {
+                left:'58%',
                     show: true,
                     feature: {
 
@@ -435,31 +524,7 @@ export default {
                 left: 10,
                 containLabel: true
             }],
-            series: [...series,
-            {
-            name:'面积模式',
-            type:'pie',
-            radius : [30, 110],
-            center : ['85%', '50%'],
-            roseType : 'area',
-            label: {
-                        normal: {
-                            formatter: '{b|{b}：}{c}   ',
-                            borderColor: '#aaa',
-                            borderWidth: 0,
-                            rich: {
-                            
-                                b: {
-                                    fontSize: 12,
-                                    lineHeight: 16
-                                }
-        
-                            }
-                        }
-                    },
-            data:cdata
-        }
-        ]
+            series:series,
         };
         myChart.setOption(option);
         }

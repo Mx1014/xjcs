@@ -19,6 +19,8 @@
         </div>
         <div>
             <div id="echart_nhdbfx" class="echart_nhdbfx"></div>
+            <div id="echart_nhdbfx2" class="echart_nhdbfx"></div>
+            <div id="echart_nhdbfx3" class="echart_nhdbfx"></div>
 
         </div>
     </div>
@@ -55,6 +57,8 @@ export default {
                     this.info = res.data.weather[0]
                     let data = this.info.scienlist
                     let list = []
+                    let humidity = []
+                    let pm25 = []
                     let category = []
                     data.forEach(ele => {
                         list.push(
@@ -63,9 +67,16 @@ export default {
                         category.push(
                             ele.date
                         )
+                        humidity.push(
+                            ele.humidity
+                        )
+                        pm25.push(
+                            ele.pmtwo
+                        )
                     })
                     this.buildchart(category, list)
-
+                    this.buildchart2(category, pm25)
+                    this.buildchart3(category, humidity)
 
                 }
             })
@@ -81,7 +92,8 @@ export default {
             require("echarts/lib/component/dataZoom");
             require("echarts/lib/chart/candlestick"); //线
 
-
+ var color = this.$thime=='thime3'?"#4285f3":"#000"
+  color = this.$thime=='thime4'?"#24936e":color
             var myChart = echarts.init(document.getElementById("echart_nhdbfx"));
 
 
@@ -90,7 +102,10 @@ export default {
                 title: {
                     text: '天气趋势图',
                     left: 10,
-                    top:5
+                    top:5,
+                     textStyle:{
+                        color,
+                    },
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -108,11 +123,36 @@ export default {
                 },
                 xAxis: {
                     type: 'category',
-                    data: category
+                    data: category,
+                    axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
                 },
                 yAxis: {
                     name:"温度 ℃",
-                    show: true
+                    show: true,
+                    nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
                 },
                 series: [{
                         name: '气温',
@@ -127,6 +167,181 @@ export default {
                                 borderColor0: upColor
                             }
                         }
+                    }
+
+                ]
+            };
+            myChart.setOption(option);
+        },
+        buildchart2( category,list) {
+
+var color = this.$thime=='thime3'?"#4285f3":"#000"
+ color = this.$thime=='thime4'?"#24936e":color
+            var echarts = require('echarts/lib/echarts');
+            require('echarts/lib/component/tooltip');
+            require('echarts/lib/component/toolbox');
+            require('echarts/lib/component/title');
+            require("echarts/lib/component/grid");
+            require("echarts/lib/component/dataZoom");
+            require("echarts/lib/chart/line"); //线
+            require("echarts/lib/chart/bar"); //线
+
+            var thime = this.$thime=='thime3'?"light":"default"
+            var myChart = echarts.init(document.getElementById("echart_nhdbfx2"),thime);
+
+
+            let option = {
+                title: {
+                    text: 'pm2.5',
+                    left: 10,
+                    top:5,
+                    textStyle:{
+                        color,
+                    },
+                },
+                tooltip: {
+
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    bottom: '15%'
+                },
+                toolbox: {
+                    left:"90%",
+                show: true,
+                feature: {
+                    magicType: {
+                    type: ["line", "bar"]
+                    }
+                }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: category,
+                    axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
+                },
+                yAxis: {
+                    name:"pm2.5（μg/m3）",
+                    show: true,
+                    nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
+                },
+                series: [{
+                        name: 'pm2.5',
+                        type: 'line',
+                        data: list,
+                        barWidth: 10,
+                        smooth:true
+                    }
+
+                ]
+            };
+            myChart.setOption(option);
+        },
+       buildchart3( category,list) {
+
+           var color = this.$thime=='thime3'?"#4285f3":"#000"
+            color = this.$thime=='thime4'?"#24936e":color
+            var echarts = require('echarts/lib/echarts');
+            require('echarts/lib/component/tooltip');
+            require('echarts/lib/component/toolbox');
+            require('echarts/lib/component/title');
+            require("echarts/lib/component/grid");
+            require("echarts/lib/component/dataZoom");
+            require("echarts/lib/chart/line"); //线
+
+            var thime = this.$thime=='thime3'?"light":"default"
+            var myChart = echarts.init(document.getElementById("echart_nhdbfx3"),thime);
+
+
+            let option = {
+                title: {
+                    text: '湿度',
+                    left: 10,
+                    top:5,
+                     textStyle:{
+                        color,
+                    },
+                },
+                tooltip: {
+
+                },
+                toolbox: {
+                    left:"90%",
+                show: true,
+                feature: {
+                    magicType: {
+                    type: ["line", "bar"]
+                    }
+                }
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    bottom: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: category,
+                    axisTick: {
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
+                },
+                yAxis: {
+                    name:"湿度(%rh)",
+                    show: true,
+                    nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
+                },
+                series: [{
+                        name: '湿度',
+                        type: 'line',
+                        data: list,
+                        barWidth: 10,
+                        smooth:true
                     }
 
                 ]

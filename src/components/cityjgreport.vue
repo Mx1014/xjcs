@@ -28,7 +28,10 @@
           </div>
         <div>
             <Table :columns="cols" :data="dataList"></Table>
-
+             <div class="export-data">
+                     <a :href="exporturl" target="_blank">导出数据</a>
+                </div>
+            
         </div>
       </div>
   </div>
@@ -133,6 +136,8 @@ export default {
                     }
                     this.buildTable(res.data.lists)
                 }
+            }).catch(e=>{
+                this.dataList=[]
             })
         },
          getOrigin(){
@@ -195,6 +200,7 @@ export default {
             this.cols = [{
                 title:"机构名称",
                 minWidth:120,
+                fixed:"left",
                 key:"name"
             }];
             if(!list){
@@ -206,12 +212,12 @@ export default {
             list.forEach(ele=>{
                 let obj = {
                     name:ele.name,
-                    total_count:ele.total_count
+                    total_count:ele.total_count+{"1":"kwh","2":"t","3":"m³","4":"L"}[this.energy_type]
                 }
                 ele.value = ele.value||[]
                 let key = 1
                 ele.value.forEach(cele=>{
-                    obj[key] = cele.origvalue
+                    obj[key] = (cele.origvalue||0)+{"1":"kwh","2":"t","3":"m³","4":"L"}[this.energy_type]
                     if(!flag){
                         this.cols.push({
                             title:cele.collectime,
@@ -241,7 +247,24 @@ export default {
         
     },
 
+    computed:{
+        exporturl(){
+                         let contrasts = this.selIds.join(",")
+            let energy_type = this.energy_type
+            let month = this.selyear.title
+            let selmonth = (this.selmonth||{}).title||""
+            if(selmonth){
+                if(selmonth<10){
+                    selmonth= "-0"+selmonth
+                }else{
+                     selmonth= "-"+selmonth
+                }
+            }
 
+            month+=selmonth
+           return `/Index/institutional_report?import=outexcel&contrasts=${contrasts}&energy_type=${energy_type}&month=${month}`
+        }
+    },
     mounted() {
         this.$Spin.hide()
         this.datetList = this.buildMonthList()

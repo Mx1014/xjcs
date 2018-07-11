@@ -11,41 +11,45 @@
               <Form >
             <Row>
                 <Col span="8">
-                    <FormItem :label-width="120" label="时间周期:">
+                    <!-- <FormItem :label-width="120" label="时间周期:">
                         <Select v-model="time_type" style="width:200px" @on-change="getData">
                             <Option v-for="item in dateList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                         </Select>
+                    </FormItem> -->
+
+                     <FormItem :label-width="120" label="时间周期:">
+                        <DatePicker @on-ok="getData()" type="daterange" v-model="date" confirm :options="options2" placeholder="选择时间" style="width: 200px"></DatePicker>
                     </FormItem>
                 </Col>
-                <Col span="8">
+                <!-- <Col span="8">
                 <FormItem :label-width="120" label="时间区间:">
 
                             <DatePicker @on-change="getData" v-model="start_time" :type="dttype" placeholder="Select date" style="width: 200px"></DatePicker>
 
                     </FormItem></Col>
                 <Col span="8">
-                </Col>
+                </Col> -->
             </Row>
-            <Row>
+            <!-- <Row>
                  <Col span="8">
                 <FormItem :label-width="120" label="">
                         <!-- <Select v-model="energy_type" style="width:200px" @on-change="getData">
                             <Option  :value="1" >电耗</Option>
                             <Option  :value="2" >水耗</Option>
                         </Select> -->
-                    </FormItem></Col>
-                     <Col span="8">
-                <FormItem :label-width="120" label="">
+                    <!-- </FormItem></Col>
+                     <Col span="8"> -->
+                <!-- <FormItem :label-width="120" label="">
 
                             <DatePicker v-model="end_time" :type="dttype" placeholder="Select date" style="width: 200px" @on-change="getData"></DatePicker>
 
                     </FormItem></Col>
-            </Row>
+            </Row>  -->
             </Form>
            
         </div>
          <div class='xjcs-c-action'>
-                <span class="xjcs-city-title">能耗曲线</span>
+                <span class="xjcs-city-title">PUE曲线</span>
                 <!-- <span class="xjcs-city-type"><span>电能</span><span>水能</span></span>
                 <span class="xjcs-city-time"><span>今日</span><span>本月</span><span>今年</span></span>     -->
             </div>
@@ -53,6 +57,9 @@
             <div id="echart_nhzl" class="echart_nhzl"></div>
             <div>
                 <Table :columns="cols" :data="dataList"></Table>
+                 <div class="export-data">
+                     <a :href="exporturl" target="_blank">导出数据</a>
+                </div>
             </div>
         </div>
       </div>
@@ -69,6 +76,7 @@ require('echarts/lib/component/title');
 export default {
     data() {
         return {
+            date:[new Date(),new Date()],
             start_time:new Date(),
             end_time:new Date(),
             energy_type:1,
@@ -91,7 +99,71 @@ export default {
             },{
                 label: "年",
                 value: 3
-            }]
+            }],
+            options2: {
+                    shortcuts: [
+                        {
+                            text: '今天',
+                            value () {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 0);
+                                return [start, end];
+                            }
+                        },
+                        {
+                            text: '昨天',
+                            value () {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
+                                return [start, start];
+                            }
+                        },
+                        {
+                            text: '最近7天',
+                            value () {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                                return [start, end];
+                            }
+                        },{
+                            text: '最近30天',
+                            value () {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                                return [start, end];
+                            }
+                        },
+                         {
+                            text: '当月',
+                            value () {
+                                const end = new Date();
+                                const start = new Date();
+                                start.setTime(start.getTime() - 3600 * 1000 * 24 * (end.getDate()-1));
+                                return [start, end];
+                            }
+                        },
+                        {
+                            text: '上月',
+                            value () {
+                                const end = new Date();
+                                const start = new Date();
+                                end.setTime(end.getTime() - 3600 * 1000 * 24 * (end.getDate()));
+                                start.setTime(end.getTime() - 3600 * 1000 * 24 * (end.getDate()-1));
+                                return [start, end];
+                            }
+                        },
+                        {
+                            text: '自定义',
+                            value () {
+                                return [];
+                            }
+                        }
+                    ]
+                },
         };
     },
     computed:{
@@ -105,6 +177,22 @@ export default {
             if(this.time_type==1){
                 return "date"
             }
+        },
+        exporturl(){
+            let times = this.date[1].getTime() - this.date[0].getTime()
+            let day = 24*3600*1000
+            let time_type = 1
+            if(times>day&&times<=day*30){
+                time_type = 2
+            }
+            if(times>30*day){
+                time_type = 3
+            }
+            let emp_code = this.selnode.value
+            let start_time = this.getStartDate(this.date[0])
+            let end_time = this.getEndDate(this.date[1])
+            let energy_type = this.energy_type
+            return `/Index/get_energy_pue_data?import=outexcel&start_time=${start_time}&end_time=${end_time}&emp_code=${emp_code}&time_type=${time_type}`
         }
     },
     methods: {
@@ -132,7 +220,7 @@ export default {
                         disableCheckbox:lv!=4,
                         children:_buildChildren(ele.regList||ele.empList,lv+1)
                     }
-                    if(index==0&&lv==4){
+                   if(index==0&&lv==4&&!this.selnode.value){
                         obj.selected = true
                         this.selnode = obj
                     }
@@ -163,35 +251,32 @@ export default {
                 console.log(e)
             })
         },
-              getStartDate(date){
-            if(this.time_type == 3){
-                return date.format("yyyy")+"-01-01 00:00:00"
-            }
-            if(this.time_type == 2){
-                return date.format("yyyy-MM")+"-01 00:00:00"
-            }
-            if(this.time_type == 1){
+          getStartDate(date){
+
                  return date.format("yyyy-MM-dd")+" 00:00:00"
-            }
+     
 
         },
          getEndDate(date){
-            if(this.time_type == 3){
-                return date.format("yyyy")+"-12-31 23:59:59"
-            }
-            if(this.time_type == 2){
-                let end = new Date(date.getFullYear(),date.getMonth()+1,0).getDate()
-                return date.format("yyyy-MM")+"-"+end+" 23:59:59"
-            }
-            if(this.time_type == 1){
+
                  return date.format("yyyy-MM-dd")+" 23:59:59"
-            }
+      
+
         },
          getData(){
+
+            let times = this.date[1].getTime() - this.date[0].getTime()
+            let day = 24*3600*1000
+            let time_type = 1
+            if(times>day&&times<=day*30){
+                time_type = 2
+            }
+            if(times>30*day){
+                time_type = 3
+            }
             let emp_code = this.selnode.value
-            let time_type = this.time_type
-            let start_time = this.getStartDate(this.start_time)
-            let end_time = this.getEndDate(this.end_time)
+            let start_time = this.getStartDate(this.date[0])
+            let end_time = this.getEndDate(this.date[1])
             let energy_type = this.energy_type
             this.$http.get("Index/get_energy_pue_data",{
                 params:{
@@ -203,21 +288,21 @@ export default {
             }).then((res)=>{
                 if(res.data.status=='ok'){
                     this.buildchart(res.data.lists[0].data)
-                    this.buildTable(res.data.lists[0].data,res.data.lists[0].name)
+                    this.buildTable(res.data.lists[0].data,res.data.lists[0].name,res.data.lists[0].elect_each_all)
                 }
             })
         },
-        buildTable(list,name){
+        buildTable(list,name,total){
             let dataList = [{}];
-            let sum = 0;
+            // let sum = 0;
 
             let j = 0
             list.forEach(ele=>{
                 j++,
                 dataList[0][j] = ele.value
-                sum+=ele.value
+                // sum+=ele.value
             })
-            dataList[0].total = sum.toFixed(2);
+            dataList[0].total = total
             dataList[0].name = name
             let i = 0
             let span = list.map(ele=>{
@@ -232,16 +317,19 @@ export default {
                 title:"机构",
                 key:"name",
                  width:120,
+                 fixed:"left"
             },{
-                title:"分类合计",
+                title:"PUE均值",
                 key:"total",
                 width:120,
+                 fixed:"left"
             },...span]
             this.cols = cols
             this.dataList = dataList
         },
         buildchart(list){
-
+            var color = this.$thime=='thime3'?"#4285f3":"#000"
+            color = this.$thime=='thime4'?"#24936e":color
             let data = list.map(ele=>{
                 return ele.value
             })
@@ -256,7 +344,8 @@ export default {
             require("echarts/lib/component/dataZoom");
             require("echarts/lib/chart/line"); //线
             require("echarts/lib/chart/bar"); //线
-        var myChart = echarts.init(document.getElementById("echart_nhzl"));
+            var thime = this.$thime=='thime3'?"light":"default"
+        var myChart = echarts.init(document.getElementById("echart_nhzl"),thime);
 
 
         let option = {
@@ -284,11 +373,38 @@ export default {
                 type: 'category',
                 data: span,
                 axisTick: {
-                    alignWithLabel: true
-                }
+                        alignWithLabel: true,
+                        lineStyle:{
+                            color
+                        }
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    }
+          
             }],
             yAxis: [{
-                type: 'value'
+                type: 'value',
+                 nameTextStyle:{
+                        color,
+                    },
+                    axisLine:{
+                        show:false
+                    },
+                    axisLabel:{
+                        textStyle:{
+                            color:color
+                        }
+                    },splitLine:{
+                        lineStyle:{
+                            color:'#666'
+                        }
+                    }
             }],
             grid: {
                 left: '3%',

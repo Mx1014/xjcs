@@ -10,40 +10,46 @@
     </div>
     <div class="xjcs-c-right">
         <div class="bilid-info">
+          
+
             <div class="build-info-title">
-                <h3>{{info.employed_name}}</h3>
+                <h3>{{info.emp_name}}</h3>
             </div>
             <div class="build-info-items">
                 <h3>基本信息</h3>
                 <div class="content">
+                                <span class="content-img">
+                <img :src='info.picpath' />
+              </span>
                     <span class="content-text" style="">
                         <p style="padding-left:20px">
                             <div>
-                                 建筑面积: {{info.built_area   }}
+                                 建筑面积: {{info.built_area   }}㎡
                             </div>
                             <div>
-                                用能人数: {{info.energy_use    }}
+                                用能人数: {{info.energy_use    }}人
                             </div>
-                            <div>
-                                  项目地址: {{info.proaddress  }}
-                            </div>
+                            
                             <div>
                                 节能技术应用类型: {{info.techn_type_name    }}
                             </div>
                             <div>
                               建筑类型: {{info.type_name  }}
                             </div>
+                            <div>
+                                  地址: {{info.proaddress  }}
+                            </div>
                         </p>
                     </span>
                 </div>
             </div>
            <div class="build-info-items">
-                <!-- <h3> 建筑简介</h3>
-                <div class="content">
+                <h3> 建筑简介</h3>
+                <div class="content" style="padding-left:15px;line-height:1.6">
                     <p>
-                        {{info.content.probrief}}
+                        {{info.probrief}}
                     </p>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
@@ -109,7 +115,7 @@ export default {
                         disabled:lv!=4,
                         children: _buildChildren(ele.regList || ele.empList,lv+1)
                     }
-                    if(index==0&&lv==4){
+                    if(index==0&&lv==4&&!this.selnode.value){
                         obj.selected= true
                         this.selnode = obj
                     }
@@ -175,7 +181,13 @@ export default {
         });
     },
     init() {
+      
       this.map = new BMap.Map("allmap"); // 创建Map实例
+      if(this.$thime=='thime3'){
+         var mapStyle={  style : "midnight" }  
+        this.map.setMapStyle(mapStyle);
+      }
+     
       var point = new BMap.Point(114.06667, 22.61667); // 创建点坐标
       this.map.centerAndZoom(point, 18);
       this.map.enableScrollWheelZoom();
@@ -251,14 +263,17 @@ export default {
 span.content-img {
   position: absolute;
   right: 0;
-  top: 50px;
+  top: 0px;
   display: block;
-  width: 180px;
-  height: 140px;
+  width: 133px;
+  height: 100px;
 }
 
 .content-img img {
-  width: 100%;
+  width:133px;
+}
+.content-text div{
+  width:200px
 }
 </style>
 

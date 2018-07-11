@@ -1,6 +1,6 @@
 <template>
-  <div class="sys-config">
-      <iframe :src="`${configPath}/Configs/index.html`" frameborder="0"></iframe>
+  <div class="user-config">
+      <iframe :src="`${configPath}/User/user_manage.html`" frameborder="0"></iframe>
   </div>
 </template>
 <script>
@@ -11,7 +11,7 @@
     }
 </script>
 <style>
-    .sys-config{
+    .user-config{
         height: 100%;
         width: 100%;
     }
