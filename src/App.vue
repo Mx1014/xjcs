@@ -627,11 +627,11 @@ $c-bg-color-t3:rgba(134, 211, 241, 0.05);
     .sjcs-info{
         color:$color-txt-t3;
     }
-.ivu-table td.col-heignlight {
-           background:rgba(134, 211, 241, 0.2);
+    .ivu-table-fixed-header th.col-heignlight {
+           background:#2d3f6b;
        }
-       .ivu-table th.col-heignlight {
-           background:rgba(134, 211, 241, 0.2);
+        .ivu-table-fixed-body td.col-heignlight {
+           background:#2d3f6b;
        }
     .col-heignlight .ivu-table-cell{
         /* background:rgba(134, 211, 241, 0.05); */
@@ -752,6 +752,14 @@ background:$c-bg-color-t3;
         }
         .ivu-table td{
             background:$c-bg-color-t3;
+            color:#fff
+        }
+        .ivu-table-fixed-header th{
+            background:#1c2451;
+            color:#fff
+        }
+        .ivu-table-fixed-body td{
+            background:#1c2451;
             color:#fff
         }
         .ivu-table-wrapper{

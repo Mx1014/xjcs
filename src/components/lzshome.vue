@@ -1,7 +1,7 @@
 <template>
     <div class="lzs-home" :style="{'font-size':fontSize}" id="myview">
         <div class="goback" @click="$router.go(-1)"><span class="iconfont icon-fanhui"></span>返回</div>
-        <div class="lzs-title">柳州市城中区节能管理平台</div>
+        <div class="lzs-title">{{city}}节能管理平台</div>
         <div class="lzs-left">
              <div class="main-db" id="main-db">
 
@@ -54,6 +54,7 @@ export default {
       thimesss:"thime3",
       fontSize:"20px",
       bl:1,
+      city:"",
       chart1:null,
       chart2:null,
       chart3:null,
@@ -64,6 +65,14 @@ export default {
     }
   },
   methods: {
+    getCityName(){
+      
+      console.log(process.env)
+      this.$http.get("/Public/get_public_city_name").then(res=>{
+        this.city = res.data.city
+        this.initMap();
+      })
+    },
     initMap() {
       this.$http.get("/energy/getEmploryMap").then(res=>{
         var echarts = require("echarts/lib/echarts");
@@ -110,7 +119,7 @@ export default {
         ) || 1;
       let option = {
         title:{
-          text:`柳州市城中区纳入项目${sdata.pronum||0}个,监测点共计${sdata.tnum||0}个,当前在线${sdata.zxnum||0}个,离线${sdata.lxnum||0}个`,
+          text:`${this.city}纳入项目${sdata.pronum||0}个,监测点共计${sdata.tnum||0}个,当前在线${sdata.zxnum||0}个,离线${sdata.lxnum||0}个`,
           left:'center',
           right:'center',
           textStyle:{
@@ -195,7 +204,7 @@ export default {
         },
         series: [
           {
-            name: "电能",
+            name: "电",
             type: "gauge",
             radius: '50%',
             max:(data.power_quota)||1,
@@ -241,10 +250,10 @@ export default {
                 fontSize:12*this.bl,
               }
             },
-            data: [{ value: data.power_quota-data.power_value ,name:"电能"}]
+            data: [{ value: data.power_quota-data.power_value ,name:"电"}]
           },
            {
-            name: "水能",
+            name: "水",
             type: "gauge",
             radius: '50%',
             max:data.wather_quota||1,
@@ -292,10 +301,10 @@ export default {
 
                 color
             },
-            data: [{ value: data.wather_quota-data.wather_value,name:"水能"}]
+            data: [{ value: data.wather_quota-data.wather_value,name:"水"}]
           },
            {
-            name: "油能",
+            name: "油",
             type: "gauge",
             radius: '50%',
             max:(data.oil_quota)||1,
@@ -338,10 +347,10 @@ export default {
                 fontSize: 16*this.bl,
                 color
             },
-            data: [{ value: data.oil_quota-data.oil_value ,name:"油能"}]
+            data: [{ value: data.oil_quota-data.oil_value ,name:"油"}]
           },
            {
-            name: "汽能",
+            name: "汽",
             type: "gauge",
             radius: '50%',
             max:data.gas_quota||1,
@@ -390,7 +399,7 @@ export default {
                 fontSize:12*this.bl,
               }
             },
-            data: [{ value: data.gas_quota-data.gas_value,name:"汽能"}]
+            data: [{ value: data.gas_quota-data.gas_value,name:"汽"}]
           },
         ]
       };
@@ -1027,7 +1036,8 @@ center:['53%',"50%"],
   },
   mounted() {
     this.$Spin.hide();
-    this.initMap();
+    this.getCityName()
+    
     this.initYb();
     this.initdb();
     this.initweek();
@@ -1038,10 +1048,11 @@ center:['53%',"50%"],
 };
 </script>
 <style lang="scss" scoped>
+$lzs-div-bg:rgba(134, 211, 241, 0.05);
 .lzs-home{
   white-space: nowrap;
   text-align: center;
-  background: #151d4e;
+  background: linear-gradient(to top right,#161a49, #161a49 , #14498a);
   margin: -1em;
   padding-top:2em; 
   box-sizing: content-box;
@@ -1056,20 +1067,19 @@ center:['53%',"50%"],
   margin-right: 1em;
   .main-db {
     height: 19em;
-     background: #fff;
-     background: #222652;
+
+     background: $lzs-div-bg;
      margin-bottom: 0.5em;
   }
   .main-week {
     height: 12.5em;
-     background: #fff;
-     background: #222652;
+
+     background: $lzs-div-bg;
      margin-bottom: 0.5em;
   }
   .main-bar {
     height: 11.5em;
-    background: #fff;
-    background: #222652;
+    background: $lzs-div-bg;
   }
 }
 .lzs-center {
@@ -1081,14 +1091,14 @@ center:['53%',"50%"],
   margin-right: 1em;
   .main-map {
     height: 30em;
-     background: #fff;
-     background: #222652;
+     
+     background: $lzs-div-bg;
      margin-bottom: .5em;
   }
   .main-yb {
     height: 13.5em;
-     background: #fff;
-     background: #222652;
+
+     background: $lzs-div-bg;
   }
 }
 .lzs-right {
@@ -1097,8 +1107,7 @@ center:['53%',"50%"],
   vertical-align: top;
   .main-pie {
     height: 21.75em;
-    background: #fff;
-    background: #222652;
+    background: $lzs-div-bg;
     &:nth-child(1){
       margin-bottom: .5em;
     }

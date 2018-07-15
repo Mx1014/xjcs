@@ -8,9 +8,14 @@ import Login from './login.vue'
 import axios from "axios"
 
 import querystring from 'querystring'
+
+let baseURL = "/"
+if(process.env.NODE_ENV=="development"){
+  baseURL = "/xjcs/"
+}
 var instance = axios.create({
-  baseURL: '/',
-  timeout: 1000,
+  baseURL: baseURL,
+  timeout: 15000,
   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
   transformRequest: [function (data) {  
     // Do whatever you want to transform the data 

@@ -425,7 +425,18 @@ export default {
             series: [{
                 data: data,
                 type: 'line',
-                smooth: true
+                smooth: true,
+                 areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: 'rgb(68, 158, 255)'
+                            }, {
+                                offset: 0.7,
+                                color: 'rgba(68, 158, 255,0.1)'
+                            }])
+                        }
+                    },
             }]
         };
         myChart.setOption(option);

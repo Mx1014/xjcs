@@ -52,7 +52,7 @@ export default [
     title: "能耗报表",
     icon: "icon-shujubaobiao",
     children:[{
-        title: "城市能耗报表",
+        title: "区域能耗报表",
          name:"cityreport",
         icon: "",
         url: "/cityreport",

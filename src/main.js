@@ -128,10 +128,14 @@ Date.prototype.format = function(fmt) {
 
 // Vue.prototype.$baseUrl = '/xjcs/'
 Vue.prototype.$baseUrl = ''
+let baseURL = "/"
+if(process.env.NODE_ENV=="development"){
+  baseURL = "/xjcs/"
+}
 var instance = axios.create({
   // baseURL: '/xjcs/',
-  baseURL: '/',
-  timeout: 1000,
+  baseURL,
+  timeout: 15000,
   headers: {'Content-Type': 'application/x-www-form-urlencoded'},
   transformRequest: [function (data) {  
     // Do whatever you want to transform the data 
